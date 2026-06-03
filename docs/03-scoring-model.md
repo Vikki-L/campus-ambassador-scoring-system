@@ -4,41 +4,22 @@
 
 ## 🏗️ Architecture
 
-```
-                   ┌─────────────────────────────────┐
-                   │  Raw Videos (per Creator)       │
-                   │  · views / likes / comments     │
-                   │  · duration / desc / date       │
-                   └────────────────┬────────────────┘
-                                    │
-                   ┌────────────────▼────────────────┐
-                   │  Pre-filter                     │
-                   │  · Warm-up videos (前 N 条 + 短时长)
-                   │  · Trend videos (关键词识别)    │
-                   └────────────────┬────────────────┘
-                                    │
-                                    ▼
-                       ┌──────── Valid Videos ────────┐
-                       │  used for scoring            │
-                       └──────────────┬───────────────┘
-                                      │
-                  ┌───────────────────┴───────────────────┐
-                  │                                       │
-        ┌─────────▼─────────┐                  ┌──────────▼──────────┐
-        │  Multi-dim Score  │                  │  Phase Detection    │
-        │  outputs: 0-100   │                  │  Early/Mid/Potential│
-        └─────────┬─────────┘                  └──────────┬──────────┘
-                  │                                       │
-                  └───────────────┬───────────────────────┘
-                                  │
-                       ┌──────────▼──────────┐
-                       │  Level Assignment   │
-                       │  HIGH/MED/LOW/DROP  │
-                       └──────────┬──────────┘
-                                  │
-                       ┌──────────▼──────────┐
-                       │  Recommended Action │
-                       └─────────────────────┘
+```mermaid
+flowchart TD
+    A["Raw Videos per Creator<br/>views · likes · comments · duration · desc · date"]
+    B["Pre-filter<br/>剔除 Warm-up videos（前 N 条 + 短时长）<br/>剔除 Trend videos（关键词识别）"]
+    C["Valid Videos<br/>used for scoring"]
+    D["Multi-dim Score<br/>outputs: 0-100"]
+    E["Phase Detection<br/>Early / Mid / Potential"]
+    F["Level Assignment<br/>HIGH / MEDIUM / LOW / DROP RISK"]
+    G["Recommended Action"]
+
+    A --> B --> C
+    C --> D
+    C --> E
+    D --> F
+    E --> F
+    F --> G
 ```
 
 ## 📐 Scoring Dimensions
