@@ -1,6 +1,6 @@
 # Campus Ambassador Scoring System
 
-> Python 自研多维评分模型 · 把 Coach 团队从"凭经验清退"变成"看数据清退" · 评估 300+ 校园大使 · 辅助清退 ~100 位低效大使
+> Python 自研多维评分模型 · 把 Coach 团队从"凭经验清退"变成"看数据清退" · 评估 600+ 校园大使 · 辅助清退 ~400 位低效大使
 
 🎯 这是 [Creator Ops Portfolio](https://github.com/Vikki-L/creator-ops-portfolio) 的精选独立项目。
 
@@ -8,14 +8,14 @@
 
 ## TL;DR
 
-**Problem**：一个北美 AI 教育出海产品有 300+ 校园大使（Creator）每周拍视频。Coach 团队需要定期评估谁该重点培养、谁该清退——全凭经验，没有量化标准。
+**Problem**：一个北美 AI 教育出海产品有 600+ 校园大使（Creator）每周拍视频。Coach 团队需要定期评估谁该重点培养、谁该清退——全凭经验，没有量化标准。
 
 **Approach**：基于对头部竞品 Creator 数据的回归分析（详见 [02-data-insight](docs/02-data-insight.md)），发现 _"~30 视频判断爆款"_ 的规律 → 提炼成 _「三段踢人」方法论_ → 落地成 Python 自研评分模型（多维度评分 + 4 级分级）。
 
 **Result**：
 
-- ✅ 评估 300+ 大使
-- ✅ 基于学期数据辅助 Coach 团队清退 ~100 位低效大使
+- ✅ 评估 600+ 大使
+- ✅ 基于学期数据辅助 Coach 团队清退 ~400 位低效大使
 - ✅ 决策标准从"感觉这人不行" → 量化指标 + 推荐动作
 
 ---
