@@ -1,6 +1,6 @@
 # 03 · Scoring Model · 评分模型详细设计
 
-> 8 维度评分 → 4 级分级 → 推荐动作。本文档详细说明每个维度的设计逻辑。
+> 多维度评分 → 4 级分级 → 推荐动作。本文档详细说明每个维度的设计逻辑（具体权重以代号呈现，避免暴露业务规则）。
 
 ## 🏗️ Architecture
 
@@ -13,7 +13,7 @@
                                     │
                    ┌────────────────▼────────────────┐
                    │  Pre-filter                     │
-                   │  · Warm-up videos (前 3 条 + 时长≤15s)
+                   │  · Warm-up videos (前 N 条 + 短时长)
                    │  · Trend videos (关键词识别)    │
                    └────────────────┬────────────────┘
                                     │
@@ -25,7 +25,7 @@
                   ┌───────────────────┴───────────────────┐
                   │                                       │
         ┌─────────▼─────────┐                  ┌──────────▼──────────┐
-        │  Scoring (8 dims) │                  │  Phase Detection    │
+        │  Multi-dim Score  │                  │  Phase Detection    │
         │  outputs: 0-100   │                  │  Early/Mid/Potential│
         └─────────┬─────────┘                  └──────────┬──────────┘
                   │                                       │
@@ -41,127 +41,130 @@
                        └─────────────────────┘
 ```
 
-## 📐 Scoring Dimensions (8 维度)
+## 📐 Scoring Dimensions
 
-### 维度 1: 100K+ 爆款数 · 强算法响应信号
-```python
-if views_100k > 0:
-    score += 40
+模型用 **多个维度** 给每位大使打分（满分 100）。每个维度有自己的设计目的和相对权重（用 α/β/γ/... 表示，避免暴露具体数字）。
+
+### 维度 1：100K+ 爆款数 · 强算法响应信号
 ```
-**为什么权重最高**：100K+ 是质变信号，证明账号能突破算法上限。一个 100K 爆款的招新价值 ≈ 20 个 5K 视频。
+if 100K+ videos exist:
+    score += α   (高权重)
+```
+**为什么权重最高**：100K+ 是质变信号，证明账号能突破算法上限。一个 100K 爆款的招新价值 ≈ 多个 5K 视频的总和。
 
-### 维度 2: 10K+ 视频数 · 突破信号
-```python
-if views_10k > 0:
-    score += 20
+### 维度 2：10K+ 视频数 · 突破信号
+```
+if 10K+ videos exist:
+    score += β   (中权重，约为 α/2)
 ```
 **意义**：证明账号已经突破"小池子"，进入算法推荐扩散阶段。
 
-### 维度 3: 5K+ 视频数 · 初步算法响应
-```python
-if views_5k > 0:
-    score += 10
+### 维度 3：5K+ 视频数 · 初步算法响应
+```
+if 5K+ videos exist:
+    score += γ   (轻权重)
 ```
 **意义**：起步信号，算法开始"愿意推"。
 
-### 维度 4: 10K+ 命中率 · 算法响应稳定性
-```python
-if rate_10k >= 0.3:    score += 10  # 30%+ 视频破 10K = 持续稳定
-elif rate_10k >= 0.15: score += 5
+### 维度 4：10K+ 命中率 · 算法响应稳定性
 ```
-**为什么是 rate**：避免"运气好出过 1 个爆款"的假阳性。30% 命中率说明算法稳定喜欢这个账号。
-
-### 维度 5: 视频播放中位数 · 整体内容质量
-```python
-if median_views >= 10000:   score += 10
-elif median_views >= 5000:  score += 7
-elif median_views >= 2000:  score += 4
-elif median_views >= 1000:  score += 2
+if hit_rate >= high_threshold:
+    score += δ_high
+elif hit_rate >= mid_threshold:
+    score += δ_mid
 ```
-**为什么用中位数不用平均数**：平均数容易被单个爆款拉高（误判）；中位数代表"日常水准"。
+**为什么用 rate 而非数量**：避免"运气好出过 1 个爆款"的假阳性。高命中率说明算法稳定喜欢这个账号。
 
-### 维度 6: 早期突破 · 加入后多久出第一个爆款
-```python
-early_videos = valid_videos.head(min(5, n_valid))
-if early_videos has 100K:  score += 10
-elif early_videos has 10K: score += 6
-elif early_videos has 5K:  score += 3
+### 维度 5：视频播放中位数 · 整体内容质量
+```
+按梯度加分:
+    very high  → score += ε_4
+    high       → score += ε_3
+    moderate   → score += ε_2
+    low        → score += ε_1
+```
+**为什么用中位数而非平均数**：平均数容易被单个爆款拉高（误判）；中位数代表"日常水准"。
+
+### 维度 6：早期突破 · 加入后多久出第一个爆款
+```
+early = first 5 videos
+if early contains 100K+: score += ζ_high
+elif early contains 10K+: score += ζ_mid
+elif early contains 5K+:  score += ζ_low
 ```
 **意义**：早期突破（前 5 视频内出爆款）= 账号天赋好 + 算法快速识别 → 加分。
 
-### 维度 7: 后期反向扣分 · 拍了很多但没突破 = 警示信号
-```python
-if n_valid >= 10 and max_views < 5000:
-    score -= 10  # 拍了 10+ 视频但最高才 5K
-if n_valid >= 20 and max_views < 10000:
-    score -= 10  # 拍了 20+ 视频但没有 10K = 严重警示
+### 维度 7：后期反向扣分 · 拍了很多但没突破 = 警示信号
+```
+if n_valid >= threshold_1 and max_views < limit_1:
+    score -= η_1   # 拍了较多视频但最高没破 5K
+if n_valid >= threshold_2 and max_views < limit_2:
+    score -= η_2   # 拍了很多视频但没有 10K 突破 = 严重警示
 ```
 **为什么要扣分**：这是 [02-data-insight.md](02-data-insight.md) 里"30 视频判断爆款"洞察的直接应用——投入很多但回报极低 = 应该降低评分。
 
-### 维度 8: Phase 阶段判断 · 给新人留余地
-```python
-if n_valid <= 10:    phase = 'Early Validation'    # 数据不够，谨慎判断
-elif n_valid <= 20:  phase = 'Mid Validation'      # 进入观察期
-else:                phase = 'Potential Validation' # 数据充分，可以下结论
+### 维度 8：Phase 阶段判断 · 给新人留余地
+```
+if n_valid <= early_cutoff:     phase = 'Early Validation'    # 数据不够，谨慎判断
+elif n_valid <= mid_cutoff:     phase = 'Mid Validation'      # 进入观察期
+else:                           phase = 'Potential Validation' # 数据充分，可下结论
 ```
 
 ### Phase 特殊保护规则
 
-对 Early Validation 阶段（≤10 视频）的特殊处理：
-```python
+对 **Early Validation** 阶段（视频数较少）的特殊处理：
+
+```
 if phase == 'Early Validation' and level in ('LOW', 'DROP RISK'):
-    if max_views >= 2000 or early_has_5k:
+    if max_views >= protection_threshold or early_has_5k:
         # 给新人一点缓冲——"还看不出来"而不是"已经不行了"
         level = 'LOW'
+        score = max(score, min_protected_score)
         reason += "Too early to judge — limited data but some positive signal"
 ```
 
 **为什么需要这条**：避免误伤刚加入 2 周的新人——他们可能本来就是潜力股。
 
-## 🎚️ Level Assignment (4 级)
+## 🎚️ Level Assignment
 
-```python
-if score >= 70:
-    level = 'HIGH'        # 🟢 重点培养
-elif score >= 45:
-    level = 'MEDIUM'      # 🟡 持续观察
-elif score >= 25:
-    level = 'LOW'         # 🟠 警告期
-else:
-    level = 'DROP RISK'   # 🔴 清退候选
+```
+if score >= high_threshold:        level = 'HIGH'        🟢 重点培养
+elif score >= medium_threshold:    level = 'MEDIUM'      🟡 持续观察
+elif score >= low_threshold:       level = 'LOW'         🟠 警告期
+else:                              level = 'DROP RISK'   🔴 清退候选
 ```
 
-## 🎯 Recommended Actions (针对性建议)
+> 各 threshold 经多轮校准 + Coach 反馈调整后定型。
 
-每个 Level 输出**一段具体的建议**，让 Coach 拿到评分后**直接知道下一步做什么**：
+## 🎯 Recommended Actions
+
+每个 Level 输出**一段具体建议**，让 Coach 拿到评分后**直接知道下一步做什么**：
 
 | Level | Recommended Action |
 |-------|-------------------|
-| HIGH | "Continue current strategy. Consider increasing posting frequency to maximize momentum. Test new content formats to diversify growth." |
-| MEDIUM | "Algorithm is responding — keep testing templates. Focus on replicating what worked in top-performing videos. Aim for consistency." |
-| LOW | "Review content strategy. Analyze top-performing videos for patterns. Consider coaching session on hook optimization and content quality." |
-| DROP RISK | "Needs immediate intervention. Schedule 1-on-1 coaching. Review if content aligns with platform best practices. Consider whether to continue investment." |
+| HIGH | 继续当前策略 · 考虑提高发视频频率以最大化势能 · 测试新内容格式以多样化增长 |
+| MEDIUM | 算法在响应 · 持续测试模板 · 聚焦复制 Top 视频的成功要素 · 追求一致性 |
+| LOW | review 内容策略 · 分析 Top 视频找规律 · 安排 coaching session 优化 hook 与内容质量 |
+| DROP RISK | 需立即干预 · 安排 1-on-1 coaching · review 内容是否对齐平台最佳实践 · 评估是否继续投入 |
 
-## 🛠️ Pre-filter Logic (Why It Matters)
+## 🛠️ Pre-filter Logic · Why It Matters
 
-不所有视频都参与评分。两类视频会被剔除：
+不是所有视频都参与评分。两类视频会被剔除：
 
 ### Warm-up Videos
-```python
-def is_warmup(video, idx):
-    if idx >= 3: return False
-    return video['duration'] <= 15  # 前 3 条 + 时长 ≤ 15s = warm-up
+```
+if 视频在最早的前 N 条 and 视频时长 <= 短时长阈值:
+    标记为 warm-up，不参与评分
 ```
 **为什么剔除**：新账号通常前几条是"养号"测试视频，不代表正式内容能力。
 
 ### Trend Videos
-```python
-TREND_KEYWORDS = ['trend', 'viral', 'dance', 'challenge', 'duet', 'stitch',
-                  'pov', 'grwm', 'transition', 'asmr', 'storytime', ...]
+```
+TREND_KEYWORDS = [trend, viral, dance, challenge, duet, stitch, pov, grwm, 
+                  transition, asmr, storytime, ...]
 
-def is_likely_trend(desc):
-    if 关键词命中数 >= 2 and 没有 study 类关键词:
-        return True
+if 描述命中 trend 关键词 >= 阈值 AND 没有业务相关关键词:
+    标记为 trend，不参与评分
 ```
 **为什么剔除**：Trend 视频靠平台流量红利，不代表 Creator 自己的内容能力——它告诉你的是"热点跟得快"，不是"能持续产出"。
 

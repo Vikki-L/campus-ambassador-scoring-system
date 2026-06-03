@@ -34,12 +34,7 @@
 
 ### 1. **按 Coach 分组 + 排序**
 
-报告里达人**按"所属 Coach"分组**，组内**按 potential_score 倒序**——让每位 Coach 一打开报告就能看到自己下属的完整画面，而不是混在 300+ 数据里找。
-
-```python
-results_df = results_df.sort_values(['coach', 'potential_score'],
-                                     ascending=[True, False])
-```
+报告里达人**按"所属 Coach"分组**，组内**按潜力评分倒序**——让每位 Coach 一打开报告就能看到自己下属的完整画面，而不是混在 300+ 数据里找。
 
 ### 2. **推荐动作 → 转化为具体 Coach 任务**
 
@@ -66,19 +61,19 @@ results_df = results_df.sort_values(['coach', 'potential_score'],
 
 ### Before（评分系统上线前）
 ```
-Coach: "我感觉 @vikki_clone_1 最近不太行了..."
+Coach: "我感觉某位大使最近不太行了..."
 Manager: "你确定吗？拍了多少条？最高多少？"
 Coach: "呃...我得去 Excel 拉一下"
 [一周后]
-Coach: "好像是 12 条，最高 3K，但 Ta 上次有个不错的..."
+Coach: "好像 10+ 条，最高几 K，但 Ta 上次有个不错的..."
 Manager: "再观察看看吧"
 ```
 
 ### After（评分系统上线后）
 ```
-Manager 打开报告 → 看到 @vikki_clone_1: DROP RISK · score 18
-  · "Posted 14 valid videos but max views only 3,200 — weak signal"
-  · "10K rate is 0% — algorithm not responding"
+Manager 打开报告 → 看到某位大使: DROP RISK · 评分较低
+  · "拍了 N 条有效视频但最高播放偏弱 — weak signal"
+  · "10K 命中率为 0% — algorithm not responding"
   · "Phase: Mid Validation"
   · Recommended: "Needs immediate intervention..."
 
