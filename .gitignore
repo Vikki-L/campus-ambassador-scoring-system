@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+._*
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.venv/
+venv/
+.python-version
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Secrets / Data (CRITICAL — never commit real ambassador data)
+*.key
+*.token
+*.env
+.env*
+real_data/
+private/
+*real_videos.xlsx
+*real_accounts.xlsx
+analysis_results.json
+*_report.html
+!samples/sample_*.csv
+
+# Logs
+*.log

@@ -1,0 +1,28 @@
+account,create_time,play_count,digg_count,comment_count,share_count,duration,desc,page_url
+ambassador_a,2026-02-01,8500,420,38,12,18,"how I solve calc problems faster",https://example.com/v1
+ambassador_a,2026-02-03,12300,580,52,21,22,"study with me 3 hours",https://example.com/v2
+ambassador_a,2026-02-06,3200,180,18,5,15,"my college morning routine",https://example.com/v3
+ambassador_a,2026-02-09,156000,8200,420,180,28,"this AI tutor changed my GPA",https://example.com/v4
+ambassador_a,2026-02-12,18000,920,68,32,20,"3 study tips that actually work",https://example.com/v5
+ambassador_a,2026-02-15,9800,510,42,18,17,"locked in for finals week",https://example.com/v6
+ambassador_a,2026-02-18,14500,720,55,25,24,"solving 10 problems in 5 min",https://example.com/v7
+ambassador_a,2026-02-21,22000,1100,82,38,19,"why I switched to this app",https://example.com/v8
+ambassador_a,2026-02-24,7600,380,32,11,16,"day in life as a STEM major",https://example.com/v9
+ambassador_a,2026-02-27,11200,580,48,22,21,"physics made easy",https://example.com/v10
+ambassador_b,2026-02-01,1200,45,8,2,12,"trend dance challenge",https://example.com/b1
+ambassador_b,2026-02-04,800,32,5,1,11,"viral transition pov",https://example.com/b2
+ambassador_b,2026-02-07,2400,98,15,4,18,"my notes for chem",https://example.com/b3
+ambassador_b,2026-02-10,3100,120,18,6,22,"how to study textbook",https://example.com/b4
+ambassador_b,2026-02-13,1800,75,11,3,19,"midterm prep tips",https://example.com/b5
+ambassador_b,2026-02-16,2200,90,14,5,21,"answer key for hw",https://example.com/b6
+ambassador_b,2026-02-19,1600,68,9,2,17,"calculator hack",https://example.com/b7
+ambassador_b,2026-02-22,2800,115,16,7,23,"study lofi vibes",https://example.com/b8
+ambassador_b,2026-02-25,1900,82,12,4,20,"exam week reality",https://example.com/b9
+ambassador_b,2026-02-28,2100,89,13,5,18,"homework done fast",https://example.com/b10
+ambassador_b,2026-03-03,1700,72,10,3,19,"my study spot",https://example.com/b11
+ambassador_b,2026-03-06,2500,105,15,6,22,"physics formulas",https://example.com/b12
+ambassador_c,2026-02-01,650,28,5,1,13,"hi guys first vid",https://example.com/c1
+ambassador_c,2026-02-04,420,18,3,0,14,"intro to my channel",https://example.com/c2
+ambassador_c,2026-02-07,5200,210,25,8,20,"this app helps with math",https://example.com/c3
+ambassador_c,2026-02-10,3800,165,18,6,18,"my fav study setup",https://example.com/c4
+ambassador_c,2026-02-13,2900,128,14,4,17,"calc homework speed run",https://example.com/c5
