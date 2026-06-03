@@ -84,7 +84,7 @@ campus-ambassador-scoring-system/
 **LIU Zibing (Vikki)** · zibingl2@illinois.edu
 
 - 🎓 UIUC Grainger College of Engineering · 金融工程硕士
-- 💼 AI 教育出海产品 · 产品助理（2025.01 – 至今）
+- 💼 AI 教育出海产品 · 产品助理（2025.01 – 2026.06）
 - 🐙 [Main Portfolio](https://github.com/Vikki-L/creator-ops-portfolio)
 
 ---
