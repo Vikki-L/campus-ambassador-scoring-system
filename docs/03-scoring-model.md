@@ -153,9 +153,9 @@ if 描述命中 trend 关键词 >= 阈值 AND 没有业务相关关键词:
 
 | Cohort | Total | HIGH | MED | LOW | DROP RISK |
 |--------|-------|------|-----|-----|-----------|
-| Spring Semester | 300+ | ~10% | ~25% | ~35% | ~30% |
+| Spring Semester | 600+ | ~8% | ~17% | ~25% | ~50% |
 
-→ 约 30% 被识别为 DROP RISK → 经 Coach 复核后辅助清退 ~100 位。
+→ DROP RISK 比例 ~50% + 长期低评分 LOW 大使 → 经 Coach 复核后辅助清退 ~400 位。
 
 ---
 
